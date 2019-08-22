@@ -34,7 +34,7 @@ class TitleFragment : Fragment() {
     //set onClick listener for the playButton
     fun onTapPlayButton(){
         binding.playButton.setOnClickListener {view: View -> //view as in button's parentView
-            Navigation.findNavController(view).navigate(R.id.action_titleFragment_to_gameFragment)
+            Navigation.findNavController(view).navigate(TitleFragmentDirections.actionTitleFragmentToGameFragment())
             //navigation can also create onClickListeners for us as well
             //simpler way ->
             //Navigation.createNavigationOnClickListener(R.id.action_titleFragment_to_gameFragment)

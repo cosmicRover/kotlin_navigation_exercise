@@ -16,10 +16,9 @@
 
 package com.example.android.navigation
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -36,8 +35,11 @@ class GameWonFragment : Fragment() {
 
         //set onClick listener to navigate to gameFragment
         binding.nextMatchButton.setOnClickListener { view: View ->
-            Navigation.findNavController(view).navigate(R.id.action_gameWonFragment_to_gameFragment)
+            Navigation.findNavController(view).navigate(GameWonFragmentDirections.actionGameWonFragmentToGameFragment())
         }
+
+        //enable the share button
+        setHasOptionsMenu(true)
 
         getTheFragmentArguments()
 
@@ -50,4 +52,79 @@ class GameWonFragment : Fragment() {
 
         Toast.makeText(context, "Correct: ${args.numCorrect}, Questions Answered: ${args.numAnswered}", Toast.LENGTH_SHORT).show()
     }
+
+    //inflate the option menu with the winner_menu
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.winner_menu, menu)
+
+        //checking to see if sharing is actually available in the device to prevent crash
+        if (getShareIntent().resolveActivity(activity!!.packageManager) == null){
+            //hide the share menu item
+            menu?.findItem(R.id.share)?.isVisible = false
+        }
+    }
+
+    //specify funcs to trigger when optionMenu item is selected
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+
+        //when the id.itemId matches, start the share intent
+        //there's a more chain-able way of doing this using intentBuilder
+        when (item!!.itemId){
+            R.id.share -> startShareIntent()
+        }
+
+        return super.onOptionsItemSelected(item)
+
+    }
+
+    //prepare the intent
+    private fun getShareIntent() : Intent{
+        var args = GameWonFragmentArgs.fromBundle(arguments!!)
+
+        //create the intent var
+        val shareIntent = Intent(Intent.ACTION_SEND)
+
+        //specify the type of values to share
+        shareIntent.setType("text/plain") //will share just some plain text
+                //and we pass in the actual text with the putExtra param
+                .putExtra(Intent.EXTRA_TEXT,
+                    getString(R.string.share_success_text, args.numCorrect, args.numAnswered))
+
+        return shareIntent
+    }
+
+    //activate the actual intent
+    private fun startShareIntent(){
+        startActivity(getShareIntent())
+    }
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
